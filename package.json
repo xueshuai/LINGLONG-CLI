@@ -1,0 +1,24 @@
+{
+  "name": "llr-cli",
+  "version": "0.0.1",
+  "description": "llr cli for react",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "llr-create": "bin/index.js"
+  },
+  "author": "xs",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^5.0.0",
+    "download-git-repo": "^3.0.2",
+    "fs-extra": "^9.0.0",
+    "map-stream": "^0.0.7",
+    "ora": "^4.0.3",
+    "readline": "^1.3.0",
+    "vinyl-fs": "^3.0.3",
+    "which": "^2.0.2"
+  }
+}
