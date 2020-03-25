@@ -4,7 +4,7 @@
  * @Author: Shuai XUE
  * @Date: 2020-03-20 18:00:43
  * @LastEditors: Shuai XUE
- * @LastEditTime: 2020-03-24 14:00:02
+ * @LastEditTime: 2020-03-25 08:50:31
  */
 const fs = require('fs-extra');
 const chalk = require('chalk');
@@ -43,8 +43,9 @@ function initComplete(app) {
   process.exit();
 }
 
-function createProject(dest) {
+function createProject({dest, isM}) {
   const spinner = ora('downloading template')
+
   spinner.start()
   if (fs.existsSync(tempTemplatePath)) fs.emptyDirSync(tempTemplatePath)
   download(template, tempTemplatePath, { clone: true }, function (err) {
@@ -67,12 +68,26 @@ function createProject(dest) {
         .pipe(vfs.dest(dest))
         .on('end', function() {
           const app = basename(dest);
-          // const configPath = `${dest}/config.json`;
-          // const configFile = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-          // configFile.dist = `../build/${app}`;
-          // configFile.title = app;
-          // configFile.description = `${app}-project`;
-          // write(configPath, JSON.stringify(configFile, null, 2));
+          
+          const configPath = `${dest}/package.json`;
+          const configFile = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+          configFile.name = app
+          configFile.description = `${app}-project`;
+          write(configPath, JSON.stringify(configFile, null, 2));
+
+          const evnLocalPath = `${dest}/.env.local`;
+          let evnLocalFile = fs.readFileSync(evnLocalPath, 'utf-8');
+          const regexName = /(REACT_APP_NAME=")[^"]*(")/
+          const regexIsM = /(REACT_APP_ISM=)[^"]*(\s)/
+          evnLocalFile = evnLocalFile.replace(regexName, function(arg0,arg1,arg2) {
+            return arg1 + app + arg2
+          })
+          evnLocalFile = evnLocalFile.replace(regexIsM, function(arg0,arg1,arg2) {
+            return arg1 + isM + arg2 + arg2
+          })
+          
+          write(evnLocalPath, evnLocalFile);
+
           message.info('run install packages');
           require('./install')({
             success: initComplete.bind(null, app),
@@ -88,7 +103,7 @@ function createProject(dest) {
 })
 }
 
-function init({app}) {
+function init({app, isM}) {
   const dest = process.cwd();
   const appDir = join(dest, `./${app}`);
   if (fs.existsSync(appDir)) {
@@ -102,7 +117,7 @@ function init({app}) {
             .emptyDir(appDir)
             .then(() => {
               spinner.stop();
-              createProject(appDir);
+              createProject({dest: appDir, isM});
             })
             .catch(err => {
               console.error(err);
@@ -113,7 +128,7 @@ function init({app}) {
       }
     );
   } else {
-    createProject(appDir);
+    createProject({dest: appDir, isM});
   }
 }
 

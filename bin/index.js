@@ -5,7 +5,7 @@
  * @Author: Shuai XUE
  * @Date: 2020-03-20 17:07:25
  * @LastEditors: Shuai XUE
- * @LastEditTime: 2020-03-24 14:56:26
+ * @LastEditTime: 2020-03-25 09:00:46
  */
 const fs = require('fs-extra');
 const path = require('path');
@@ -32,17 +32,22 @@ if (process.argv.slice(2).join('') === '-v') {
 }
 
 program
-  .command('new [name]')
+  .command('new [name] [isM]')
   .alias('n')
   .description('Creates a new project')
-  .action(function (name) {
+  .action(function (name, isM) {
     const projectName = name || 'llr-react';
-    init({ app: projectName })
+    let tempIsM = isM === undefined ? 'true' : isM
+    if(tempIsM !== 'true' && tempIsM !== 'false') {
+      message.error('Param isM must be true or false')
+      process.exit()
+    }
+    init({ app: projectName, isM: tempIsM })
   });
 
 program.parse(process.argv);
 
 const cmd = process.argv[2];
-if (!['c', 'create', 'new', 'n'].includes(cmd)) {
+if (!['new', 'n'].includes(cmd)) {
   program.help();
 }
