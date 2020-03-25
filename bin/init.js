@@ -4,7 +4,7 @@
  * @Author: Shuai XUE
  * @Date: 2020-03-20 18:00:43
  * @LastEditors: Shuai XUE
- * @LastEditTime: 2020-03-25 08:50:31
+ * @LastEditTime: 2020-03-25 14:31:21
  */
 const fs = require('fs-extra');
 const chalk = require('chalk');
@@ -18,7 +18,8 @@ const map = require('map-stream');
 const common = require('./common');
 const {message, write} = common;
 
-const template = 'direct:http://git.jd.com/public-components/react-ts-basic.git';
+const constant = require('./constant')
+const {TEMPLATE_URL, TYPE_ENUM} = constant
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -43,12 +44,19 @@ function initComplete(app) {
   process.exit();
 }
 
-function createProject({dest, isM}) {
+function createProject({type, dest, isM}) {
+  
+  if(!TYPE_ENUM.includes(type)) {
+    message.error(`Type must be [${TYPE_ENUM}]`)
+    process.exit()
+  }
+
   const spinner = ora('downloading template')
 
   spinner.start()
   if (fs.existsSync(tempTemplatePath)) fs.emptyDirSync(tempTemplatePath)
-  download(template, tempTemplatePath, { clone: true }, function (err) {
+
+  download(TEMPLATE_URL[type], tempTemplatePath, { clone: true }, function (err) {
     spinner.stop()
     if (err) {
       console.log(err)
@@ -75,18 +83,33 @@ function createProject({dest, isM}) {
           configFile.description = `${app}-project`;
           write(configPath, JSON.stringify(configFile, null, 2));
 
-          const evnLocalPath = `${dest}/.env.local`;
-          let evnLocalFile = fs.readFileSync(evnLocalPath, 'utf-8');
-          const regexName = /(REACT_APP_NAME=")[^"]*(")/
-          const regexIsM = /(REACT_APP_ISM=)[^"]*(\s)/
-          evnLocalFile = evnLocalFile.replace(regexName, function(arg0,arg1,arg2) {
-            return arg1 + app + arg2
-          })
-          evnLocalFile = evnLocalFile.replace(regexIsM, function(arg0,arg1,arg2) {
-            return arg1 + isM + arg2 + arg2
-          })
-          
-          write(evnLocalPath, evnLocalFile);
+          if(type === 'react') {
+            const evnLocalPath = `${dest}/.env.local`;
+            let evnLocalFile = fs.readFileSync(evnLocalPath, 'utf-8');
+            const regexName = /(REACT_APP_NAME=")[^"]*(")/
+            const regexIsM = /(REACT_APP_ISM=)[^"]*(\s)/
+            evnLocalFile = evnLocalFile.replace(regexName, function(arg0,arg1,arg2) {
+              return arg1 + app + arg2
+            })
+            evnLocalFile = evnLocalFile.replace(regexIsM, function(arg0,arg1,arg2) {
+              return arg1 + isM + arg2 + arg2
+            })
+            write(evnLocalPath, evnLocalFile);
+          }
+
+          if(type === 'vueplus') {
+            const evnLocalPath = `${dest}/self.config.js`;
+            let evnLocalFile = fs.readFileSync(evnLocalPath, 'utf-8');
+            const regexName = /(name:\s')[^']*(')/
+            const regexTitle = /(htmlTitle:\s')[^']*(')/
+            evnLocalFile = evnLocalFile.replace(regexName, function(arg0,arg1,arg2) {
+              return arg1 + app + arg2
+            })
+            evnLocalFile = evnLocalFile.replace(regexTitle, function(arg0,arg1,arg2) {
+              return arg1 + app + arg2
+            })
+            write(evnLocalPath, evnLocalFile);
+          }
 
           message.info('run install packages');
           require('./install')({
@@ -103,7 +126,7 @@ function createProject({dest, isM}) {
 })
 }
 
-function init({app, isM}) {
+function init({type, app, isM}) {
   const dest = process.cwd();
   const appDir = join(dest, `./${app}`);
   if (fs.existsSync(appDir)) {
@@ -117,7 +140,7 @@ function init({app, isM}) {
             .emptyDir(appDir)
             .then(() => {
               spinner.stop();
-              createProject({dest: appDir, isM});
+              createProject({type, dest: appDir, isM});
             })
             .catch(err => {
               console.error(err);
@@ -128,7 +151,7 @@ function init({app, isM}) {
       }
     );
   } else {
-    createProject({dest: appDir, isM});
+    createProject({type, dest: appDir, isM});
   }
 }
 
