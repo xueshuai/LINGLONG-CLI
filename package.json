@@ -1,6 +1,6 @@
 {
   "name": "llr-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "llr cli for react",
   "main": "index.js",
   "scripts": {
