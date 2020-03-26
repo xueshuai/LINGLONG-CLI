@@ -4,12 +4,13 @@
  * @Author: Shuai XUE
  * @Date: 2020-03-23 09:06:08
  * @LastEditors: Shuai XUE
- * @LastEditTime: 2020-03-23 09:09:08
+ * @LastEditTime: 2020-03-26 14:51:04
  */
 const fs = require('fs-extra');
 const os = require('os');
 const path = require('path');
 const chalk = require('chalk');
+const inquirer = require('inquirer');
 
 const sep = os.platform() === 'win32' ? '\\' : '/';
 
@@ -61,4 +62,44 @@ function exportCodeGenerator(type, options) {
   return code
 }
 
-module.exports = { copyTemplate, write, mkdir, message, sep, exportCodeGenerator }
+function getInfo() {
+  return inquirer.prompt([
+    {
+      name: 'pro-name',
+      type: 'input',
+      message: `Project Name?`
+    },
+    {
+      name: 'pro-type',
+      type: 'list',
+      message: `Choose your web template?`,
+      choices: [
+        'react-typescript',
+        'vue-m',
+        'vue-pc',
+        'vue-activity'
+      ],
+      default: 0
+    }
+  ])
+    .then(answers => {
+      if (answers["pro-type"] === 'react-typescript') {
+        return inquirer.prompt({
+          name: 'pro-isM',
+          type: 'list',
+          message: 'Is this a template for mobile?',
+          choices: ['true', 'false']
+        })
+          .then(finalAnswers => {
+            return {...answers, ...finalAnswers}
+          })
+      } else {
+        return answers
+      }
+    })
+    .catch(err => {
+      console.log(chalk.red(err));
+    })
+}
+
+module.exports = { getInfo, copyTemplate, write, mkdir, message, sep, exportCodeGenerator }
