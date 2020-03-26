@@ -4,7 +4,7 @@
  * @Author: Shuai XUE
  * @Date: 2020-03-20 18:00:43
  * @LastEditors: Shuai XUE
- * @LastEditTime: 2020-03-25 14:31:21
+ * @LastEditTime: 2020-03-26 08:49:43
  */
 const fs = require('fs-extra');
 const chalk = require('chalk');
@@ -97,7 +97,7 @@ function createProject({type, dest, isM}) {
             write(evnLocalPath, evnLocalFile);
           }
 
-          if(type === 'vueplus') {
+          if(type === 'vuem' || type === 'vuepc' || type === 'vueactivity') {
             const evnLocalPath = `${dest}/self.config.js`;
             let evnLocalFile = fs.readFileSync(evnLocalPath, 'utf-8');
             const regexName = /(name:\s')[^']*(')/
