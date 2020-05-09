@@ -1,15 +1,15 @@
 {
   "name": "linglong-cli",
   "version": "0.2.1",
-  "description": "llr cli for react",
+  "description": "linglong cli for 3C-RDC-JD",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "llr-create": "bin/index.js"
+    "llcreate": "bin/index.js"
   },
-  "author": "xs",
+  "author": "3C-RDC-JD",
   "license": "MIT",
   "dependencies": {
     "commander": "^5.0.0",

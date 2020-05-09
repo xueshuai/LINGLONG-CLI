@@ -5,13 +5,13 @@
  * @Author: Shuai XUE
  * @Date: 2020-03-20 17:07:25
  * @LastEditors: Shuai XUE
- * @LastEditTime: 2020-03-26 15:35:17
+ * @LastEditTime: 2020-05-06 16:31:49
  */
 const fs = require('fs-extra');
 const path = require('path');
 const program = require('commander');
-const common = require('./common');
-const init = require('./init');
+const common = require('../src/common');
+const init = require('../src/init');
 
 const { message, getInfo } = common;
 
