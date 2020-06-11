@@ -1,6 +1,6 @@
 {
   "name": "linglong-cli",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "linglong cli for 3C-RDC-JD",
   "main": "index.js",
   "scripts": {
